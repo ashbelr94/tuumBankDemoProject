@@ -5,8 +5,8 @@ import com.tuum.bank.transactionservice.Dto.AccountClientResponseDto;
 import com.tuum.bank.transactionservice.Dto.TransactionDto;
 import com.tuum.bank.transactionservice.Events.TransactionEvent;
 import com.tuum.bank.transactionservice.Service.TransactionService;
+import com.tuum.bank.transactionservice.example.mapper.CustomTransactionMapper;
 import com.tuum.bank.transactionservice.example.mapper.TransactionMapper;
-import com.tuum.bank.transactionservice.example.model.Accounts;
 import com.tuum.bank.transactionservice.example.model.Transaction;
 import com.tuum.bank.transactionservice.exception.CustomException;
 import com.tuum.bank.transactionservice.publisher.TransactionProducer;
@@ -20,12 +20,13 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.tuum.bank.transactionservice.example.mapper.TransactionDynamicSqlSupport.transaction;
 import static org.mybatis.dynamic.sql.SqlBuilder.isLike;
@@ -36,6 +37,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private TransactionMapper transactionMapper;
+
+    @Autowired
+    private CustomTransactionMapper customTransactionMapper;
 
     @Autowired
     private Resilience4JCircuitBreakerFactory circuitBreakerFactory;
@@ -155,7 +159,6 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public TransactionResponseDto fallback(TransactionDto transactionDto, RuntimeException runtimeException){
-//        TransactionResponseDto transactionResponseDto = new TransactionResponseDto();
         if(runtimeException.getMessage().contains("api/v1/accounts/updateBalance")) {
             throw new CustomException("Account Balance updated, transaction not persisted, Roll back Account Balance Update");
         } else {
@@ -180,5 +183,37 @@ public class TransactionServiceImpl implements TransactionService {
         accAndTransacRepo.setAccounts(accountsDto.getAccount());
         accAndTransacRepo.setTransactions(transactionsList);
         return accAndTransacRepo;
+    }
+
+
+    public AccountAndTransactionResponseDto findAllTransactionByAccountIdWebClient(String accountId) {
+        Mono<AccountClientResponseDto> accountsDto = webClientBuilder.build().get().uri("http://account-service/api/v1/accounts/webclient/getAccount",
+                        uriBuilder -> uriBuilder.queryParam("accountId", accountId).build())
+                .retrieve()
+                .bodyToMono(AccountClientResponseDto.class);
+        if(accountsDto == null){
+            throw new CustomException("Internal Server Issue, Please try again later");
+        }
+
+        SelectStatementProvider allTransactionQuery = SqlBuilder.select(transaction.allColumns())
+                .from(transaction).where(transaction.accountId, isLike(accountId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        Flux<Transaction> transactionsList = Flux.fromStream(transactionMapper.selectMany(allTransactionQuery).stream());
+
+        AccountAndTransactionResponseDto accAndTransacRepo = new AccountAndTransactionResponseDto();
+        accAndTransacRepo.setAccounts(accountsDto.block().getAccount());
+        accAndTransacRepo.setTransactions(transactionsList.toStream().collect(Collectors.toList()));
+        return accAndTransacRepo;
+    }
+
+    @Override
+    public String deleteAllTransactionsByAccountId(String accountId) {
+        int i = customTransactionMapper.deleteByAccountId(accountId);
+        if(i==0){
+            throw new CustomException("Account Id: "+accountId+" Could not be deleted");
+        }else {
+            return "Successfully Deleted";
+        }
     }
 }

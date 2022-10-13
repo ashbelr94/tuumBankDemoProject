@@ -1,5 +1,6 @@
 package com.tuum.bank.accountservice.ServiceImp;
 
+import com.tuum.bank.accountservice.Dto.AccountClientResponseDto;
 import com.tuum.bank.accountservice.Dto.AccountCreateDto;
 import com.tuum.bank.accountservice.Service.AccountService;
 import com.tuum.bank.accountservice.event.AccountEvent;
@@ -8,12 +9,16 @@ import com.tuum.bank.accountservice.example.mapper.CustomAccountsMapper;
 import com.tuum.bank.accountservice.example.model.Accounts;
 import com.tuum.bank.accountservice.exception.CustomException;
 import com.tuum.bank.accountservice.publisher.AccountProducer;
+import com.tuum.bank.accountservice.util.EntityDtoUtil;
 import org.mybatis.dynamic.sql.SqlBuilder;
 import org.mybatis.dynamic.sql.render.RenderingStrategies;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -33,10 +38,16 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private CustomAccountsMapper customAccountsMapper;
 
+
     @Autowired
     public AccountServiceImpl(AccountsMapper accountsMapper) {
         this.accountsMapper = accountsMapper;
     }
+
+
+    @Autowired
+    private WebClient.Builder webClientBuilder;
+
 
     @Override
     public List<Accounts> findAllAccounts() {
@@ -47,6 +58,16 @@ public class AccountServiceImpl implements AccountService {
         List<Accounts> accountsList = accountsMapper.selectMany(ac);
         return accountsList;
     }
+
+    @Override
+    public Flux<Accounts> findAllAccountsWebClient() {
+        SelectStatementProvider ac = SqlBuilder.select(accounts.allColumns())
+                .from(accounts)
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        return Flux.fromStream(accountsMapper.selectMany(ac).stream());
+    }
+
 
 
 
@@ -59,7 +80,7 @@ public class AccountServiceImpl implements AccountService {
 //    }
 
     @Override
-    public Accounts createAccountUsingMyBatis(AccountCreateDto accountCreateDto) {
+    public Accounts createAccount(AccountCreateDto accountCreateDto) {
 
         Accounts account = customAccountsMapper.selectByUserId(accountCreateDto.getUserId()).orElse(new Accounts());
         if(account.getAccountId() != null){
@@ -77,8 +98,8 @@ public class AccountServiceImpl implements AccountService {
         accountEvent.setMessage(String.format("Account Created with user Id: %s", acc.getUserId()));
         accountEvent.setStatus("CREATED");
 
+        // Sending RabbitMq Even Message
         accountProducer.sendMessage(accountEvent);
-
         return acc;
     }
 
@@ -89,6 +110,24 @@ public class AccountServiceImpl implements AccountService {
                 .selectByPrimaryKey(accountId).orElseThrow(() ->
                         new CustomException("Invalid Account / Account not Found"));
         return account;
+    }
+
+
+    public Accounts findAccountByUserId(String userId){
+        return customAccountsMapper.selectByUserId(userId)
+                .orElseThrow(() -> new CustomException(String.format("Account not found for userId: %s", userId)));
+    }
+
+    @Override
+    public String deleteAccountByUserId(Accounts account) {
+
+        int a = accountsMapper.deleteByPrimaryKey(account.getAccountId());
+        if(a == 1){
+            return "Delete Success";
+        }else {
+            throw new CustomException("Could not Delete Resources");
+        }
+
     }
 
     @Override
@@ -106,4 +145,30 @@ public class AccountServiceImpl implements AccountService {
         accountProducer.sendMessage(accountEvent);
         return acc;
     }
+
+    @Override
+    public Mono<AccountClientResponseDto> updateAccountBalanceWebclient(Mono<Accounts> account, BigDecimal balance) {
+
+        return account.map(acc -> {
+            acc.setBalance(balance);
+            acc.setUpdateAt(new Date());
+            int i = accountsMapper.updateByPrimaryKey(acc);
+            if(i==0){
+                throw new CustomException("Account Balance was not updated");
+            }
+            return acc;
+
+        }).map(acc -> {
+            accountProducer.sendMessage(EntityDtoUtil.toEvent(acc));
+            return acc;
+        }).map(EntityDtoUtil::toDto);
+    }
+
+    @Override
+    public Mono<Accounts> findAccountByAccountIdWebClient(Mono<String> accountId) {
+        return accountId.map(e -> accountsMapper
+                .selectByPrimaryKey(e)
+                .orElseThrow(() -> new CustomException("Invalid Account / Account not found")));
+    }
+
 }

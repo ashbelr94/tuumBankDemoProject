@@ -10,4 +10,7 @@ public interface TransactionService {
 
     AccountAndTransactionResponseDto findAllTransactionByAccountId(String accountId);
 
+    AccountAndTransactionResponseDto findAllTransactionByAccountIdWebClient(String accountId);
+
+    String deleteAllTransactionsByAccountId(String accountId);
 }

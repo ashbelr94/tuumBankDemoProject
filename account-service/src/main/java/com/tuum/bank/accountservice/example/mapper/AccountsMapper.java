@@ -130,6 +130,12 @@ public interface AccountsMapper extends CommonCountMapper, CommonDeleteMapper, C
         );
     }
 
+    default Optional<Accounts> selectByUserId(String userId_) {
+        return selectOne(c ->
+                c.where(userId, isEqualTo(userId_))
+        );
+    }
+
     @Generated(value="org.mybatis.generator.api.MyBatisGenerator", date="2022-10-12T02:39:19.031952+05:30", comments="Source Table: public.accounts")
     default int update(UpdateDSLCompleter completer) {
         return MyBatis3Utils.update(this::update, accounts, completer);
