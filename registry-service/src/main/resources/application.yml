@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: registry-service
+  cloud:
+    config:
+      discovery:
+        enabled: false
+      import-check.enabled: false
+
+
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+
+server:
+  port: 8761

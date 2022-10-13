@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          lower-case-service-id: true
+          enabled: true
+      routes[0]:
+        id: account-service
+        uri: lb://account-service
+        predicates:
+          - Path=/api/v1/accounts/**
+      routes[1]:
+        id: transaction-service
+        uri: lb://transaction-service
+        predicates:
+          - Path=/api/v1/transaction/**
+
+
+server:
+  port: 4000

@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: account-service
+  flyway:
+    enabled: true
+  datasource:
+    url: jdbc:postgresql://postgres-container:5432/account-serviceDb
+    username: postgres
+    password: mysecretpassword
+    driver-class-name: org.postgresql.Driver
+  rabbitmq:
+    host: rabbit
+    port: 5672
+    username: guest
+    password: guest
+
+server:
+  port: 8080
+
+rabbitmq:
+  queue:
+    account:
+      name: account-queue
+    transaction:
+      name: transaction-queue
+  exchange:
+    name: bank-exchange
+  routingKey:
+    account:
+      key: account-routing-key
+    transaction:
+      key: transaction-routing-key

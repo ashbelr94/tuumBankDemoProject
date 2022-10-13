@@ -1,0 +1,4 @@
+ALTER TABLE accounts
+    ADD COLUMN IF NOT EXISTS country VARCHAR(36),
+    ADD COLUMN IF NOT EXISTS  currency VARCHAR(7);
+

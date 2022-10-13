@@ -1,0 +1,19 @@
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <context id="dsql" targetRuntime="MyBatis3DynamicSql">
+        <jdbcConnection driverClass="org.postgresql.Driver"
+                        connectionURL="jdbc:postgresql://postgres-container:5432/account-serviceDb"
+                        userId="postgres"
+                        password="mysecretpassword">
+
+        </jdbcConnection>
+
+        <javaModelGenerator targetPackage="com.tuum.bank.accountservice.example.model" targetProject="src/main/java"/>
+
+        <javaClientGenerator targetPackage="com.tuum.bank.accountservice.example.mapper" targetProject="src/main/java"/>
+        <table schema="public" tableName="accounts"
+               delimitIdentifiers="true" delimitAllColumns="true"/>
+    </context>
+</generatorConfiguration>

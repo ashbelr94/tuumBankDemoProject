@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: transaction-service
+  flyway:
+    enabled: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/transaction-serviceDb
+    username: postgres
+    password: mysecretpassword
+    driver-class-name: org.postgresql.Driver
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+
+server:
+  port: 8081
+
+rabbitmq:
+  queue:
+    account:
+      name: account-queue
+    transaction:
+      name: transaction-queue
+  exchange:
+    name: bank-exchange
+  routingKey:
+    account:
+      key: account-routing-key
+    transaction:
+      key: transaction-routing-key
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      accounts:
+        registerHealthIndicator: true
+        event-consumer-buffer-size: 10
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+#Resilinence4j

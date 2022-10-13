@@ -1,0 +1,86 @@
+version: '3.7'
+services:
+  db:
+    image: postgres
+    container_name: postgres-container
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecretpassword
+      - POSTGRES_DB=account-serviceDb
+      - POSTGRES_DB=transaction-serviceDb
+      - PGDATA=/data/postgres
+    volumes:
+      - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+    ports:
+      - 5432:5432
+
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "DBTest@gmail.com"
+      PGADMIN_DEFAULT_PASSWORD: "test@123"
+    ports:
+      - 16543:80
+    depends_on:
+      - db
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbit
+    ports:
+      - 15672:15672
+      - 5672:5672
+    environment:
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+  registry-service:
+    container_name: registry-service
+    build:
+      context: ./registry-service
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+  gateway-service:
+    container_name: gateway-service
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    environment:
+      - eureka.client.service-url.defaultZone=http://registry-service:8761/eureka
+    depends_on:
+      - registry-service
+    ports:
+      - "4000:4000"
+  account-service:
+    container_name: account-service
+    build:
+      context: ./account-service
+      dockerfile: Dockerfile
+    environment:
+      - eureka.client.service-url.defaultZone=http://registry-service:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - spring.datasource.url=jdbc:postgresql://postgres-container:5432/account-serviceDb
+      - spring.datasource.username=postgres
+      - spring.datasource.password=mysecretpassword
+      - spring.datasource.driver-class-name=org.postgresql.Driver
+    depends_on:
+      - db
+      - registry-service
+    ports:
+      - "8080:8080"
+  transaction-service:
+    container_name: transaction-service
+    build:
+      context: ./transaction-service
+      dockerfile: Dockerfile
+    environment:
+      - eureka.client.service-url.defaultZone=http://registry-service:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - db
+      - registry-service
+    ports:
+      - "8081:8081"
+volumes:
+  pgdata:
