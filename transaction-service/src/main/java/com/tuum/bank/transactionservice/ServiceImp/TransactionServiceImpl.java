@@ -174,6 +174,9 @@ public class TransactionServiceImpl implements TransactionService {
                 .retrieve()
                 .bodyToMono(AccountClientResponseDto.class)
                 .block();
+        if(accountsDto.getStatus().equals("ERROR")){
+            throw new CustomException(accountsDto.getCustomExceptionResponse().getMessage());
+        }
         SelectStatementProvider allTransactionQuery = SqlBuilder.select(transaction.allColumns())
                 .from(transaction).where(transaction.accountId, isLike(accountId))
                 .build()
@@ -209,9 +212,12 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public String deleteAllTransactionsByAccountId(AccountAndTransactionResponseDto transactions) {
+        if(transactions.getTransactions().size() == 0){
+            throw new CustomException("No Transactions Found, Transaction for Account Id: "+transactions.getAccounts().getAccountId()+" Could not be deleted");
+        }
         int i = customTransactionMapper.deleteByAccountId(transactions.getAccounts().getAccountId());
         if(i==0){
-            throw new CustomException("No Transactions Found, Transaction for Account Id: "+transactions.getAccounts().getAccountId()+" Could not be deleted");
+            throw new CustomException("Could not delete transaction, Internal Issue");
         }else {
             TransactionEvent event = new TransactionEvent();
             event.setMessage("All Transactions were Deleted Successfully for the account: "+transactions);
