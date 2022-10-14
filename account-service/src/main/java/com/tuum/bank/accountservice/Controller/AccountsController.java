@@ -1,5 +1,6 @@
 package com.tuum.bank.accountservice.Controller;
 
+import com.tuum.bank.accountservice.Dto.AccountAndTransactionResponseDto;
 import com.tuum.bank.accountservice.Dto.AccountBalanceUpdateDto;
 import com.tuum.bank.accountservice.Dto.AccountClientResponseDto;
 import com.tuum.bank.accountservice.Dto.AccountCreateDto;
@@ -49,6 +50,13 @@ public class AccountsController {
         AccountClientResponseDto responseDto = new AccountClientResponseDto();
         responseDto.setStatus("SUCCESS");
         responseDto.setAccount(account);
+        return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/getAllTransactions")
+    public ResponseEntity<?> findAllTransactionByAccountId(@RequestParam String accountId){
+        Accounts account = accountService.findAccountByAccountId(accountId);
+        AccountAndTransactionResponseDto responseDto = accountService.findAllTransactionByAccountId(account);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 

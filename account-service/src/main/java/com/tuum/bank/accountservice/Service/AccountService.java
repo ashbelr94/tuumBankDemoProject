@@ -1,5 +1,6 @@
 package com.tuum.bank.accountservice.Service;
 
+import com.tuum.bank.accountservice.Dto.AccountAndTransactionResponseDto;
 import com.tuum.bank.accountservice.Dto.AccountClientResponseDto;
 import com.tuum.bank.accountservice.Dto.AccountCreateDto;
 import com.tuum.bank.accountservice.example.model.Accounts;
@@ -28,4 +29,6 @@ public interface AccountService {
     Accounts findAccountByUserId(String userId);
 
     String deleteAccountByUserId(Accounts userId);
+
+    AccountAndTransactionResponseDto findAllTransactionByAccountId(Accounts accountID);
 }

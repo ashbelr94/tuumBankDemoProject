@@ -1,5 +1,6 @@
 package com.tuum.bank.accountservice.ServiceImp;
 
+import com.tuum.bank.accountservice.Dto.AccountAndTransactionResponseDto;
 import com.tuum.bank.accountservice.Dto.AccountClientResponseDto;
 import com.tuum.bank.accountservice.Dto.AccountCreateDto;
 import com.tuum.bank.accountservice.Service.AccountService;
@@ -8,6 +9,7 @@ import com.tuum.bank.accountservice.example.mapper.AccountsMapper;
 import com.tuum.bank.accountservice.example.mapper.CustomAccountsMapper;
 import com.tuum.bank.accountservice.example.model.Accounts;
 import com.tuum.bank.accountservice.exception.CustomException;
+import com.tuum.bank.accountservice.exception.TransactionException;
 import com.tuum.bank.accountservice.publisher.AccountProducer;
 import com.tuum.bank.accountservice.util.EntityDtoUtil;
 import org.mybatis.dynamic.sql.SqlBuilder;
@@ -128,6 +130,20 @@ public class AccountServiceImpl implements AccountService {
             throw new CustomException("Could not Delete Resources");
         }
 
+    }
+
+    @Override
+    public AccountAndTransactionResponseDto findAllTransactionByAccountId(Accounts account) {
+
+        AccountAndTransactionResponseDto responseDto = webClientBuilder.build().get().uri("http://transaction-service/api/v1/transaction/getTransactionsByAccountId",
+                uriBuilder -> uriBuilder.queryParam("accountId", account.getAccountId()).build())
+                .retrieve()
+                .bodyToMono(AccountAndTransactionResponseDto.class).block();
+        if(responseDto.getTransactions().size() == 0){
+            throw new TransactionException("No Transactions Found for Account: "+account.getAccountId());
+        }
+        responseDto.setStatus("SUCCESS");
+        return responseDto;
     }
 
     @Override

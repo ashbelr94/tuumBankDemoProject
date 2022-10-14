@@ -1,5 +1,6 @@
 package com.tuum.bank.accountservice.exception;
 
+import com.tuum.bank.accountservice.Dto.AccountAndTransactionResponseDto;
 import com.tuum.bank.accountservice.Dto.AccountClientResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,4 +29,14 @@ public class CustomResponseEntityExceptionHandler extends ResponseEntityExceptio
         responseDto.setCustomExceptionResponse(new CustomExceptionResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
         return ResponseEntity.ok().body(responseDto);
     }
+
+    @ExceptionHandler(TransactionException.class)
+    public ResponseEntity<AccountAndTransactionResponseDto> handleException(TransactionException ex){
+
+        AccountAndTransactionResponseDto responseDto = new AccountAndTransactionResponseDto();
+        responseDto.setStatus("ERROR");
+        responseDto.setCustomExceptionResponse(new CustomExceptionResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
+        return ResponseEntity.ok().body(responseDto);
+    }
+
 }

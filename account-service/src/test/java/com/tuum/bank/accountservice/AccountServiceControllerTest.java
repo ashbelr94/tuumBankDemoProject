@@ -2,13 +2,13 @@ package com.tuum.bank.accountservice;
 
 
 import com.tuum.bank.accountservice.Controller.AccountsController;
-import com.tuum.bank.accountservice.Dto.AccountBalanceUpdateDto;
-import com.tuum.bank.accountservice.Dto.AccountClientResponseDto;
-import com.tuum.bank.accountservice.Dto.AccountCreateDto;
+import com.tuum.bank.accountservice.Dto.*;
 import com.tuum.bank.accountservice.Enum.Currency;
+import com.tuum.bank.accountservice.Enum.TransactionType;
 import com.tuum.bank.accountservice.Service.AccountService;
 import com.tuum.bank.accountservice.Service.MapValidationErrorService;
 import com.tuum.bank.accountservice.example.model.Accounts;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +39,8 @@ public class AccountServiceControllerTest {
 
     @MockBean
     private AccountService accountServiceMock;
+
+    private String accountId;
 
     @Autowired
     private MockMvc mockMvc;
@@ -336,4 +338,79 @@ public class AccountServiceControllerTest {
     }
 
 
+    @Test
+    @DisplayName("Find All Transaction by valid account Id :: GET REQUEST  /accounts/getAllTransactions?accountId=")
+    public void findAllTransactions(){
+        WebTestClient client = WebTestClient
+                .bindToServer()
+                .baseUrl(baseUrl)
+                .build();
+
+        AccountCreateDto createDto = new AccountCreateDto();
+        createDto.setUserId("TestUser");
+        createDto.setCountry("UK");
+        createDto.setBalance(BigDecimal.valueOf(1400));
+        createDto.setCurrency(String.valueOf(Currency.EUR));
+
+        AccountClientResponseDto accountsDto = client
+                .post().uri(baseUrl+"/accounts/mybatis/createAccount").body(Mono.just(createDto), AccountCreateDto.class)
+                .exchange().expectBody(AccountClientResponseDto.class).returnResult().getResponseBody();
+
+        this.accountId = accountsDto.getAccount().getAccountId();
+
+        TransactionDto transactionDto = new TransactionDto();
+        transactionDto.setAccountId(accountsDto.getAccount().getAccountId());
+        transactionDto.setAmount(BigDecimal.valueOf(250));
+        transactionDto.setCurrency(String.valueOf(Currency.EUR));
+        transactionDto.setDescription("Depositing Salary");
+        transactionDto.setTransactionDirection(String.valueOf(TransactionType.IN));
+
+        TransactionResponseDto transaction = client
+                .post().uri(baseUrl+"/transaction/mybatis/createTransaction")
+                .body(Mono.just(transactionDto), TransactionDto.class)
+                .exchange()
+                .expectBody(TransactionResponseDto.class)
+                .returnResult().getResponseBody();
+
+        Assert.isTrue(transaction.getAccountId().equals(accountsDto.getAccount().getAccountId()), "Asserting Account Id");
+        Assert.isTrue(transaction.getCurrency().equals(accountsDto.getAccount().getCurrency()), "Asserting Currency");
+        Assert.isTrue(transaction.getBalance().intValue() == 1650, "Asserting Balance after transaction");
+
+        // Second Transaction
+        TransactionDto transactionDto2 = new TransactionDto();
+        transactionDto2.setAccountId(accountsDto.getAccount().getAccountId());
+        transactionDto2.setAmount(BigDecimal.valueOf(250));
+        transactionDto2.setCurrency(String.valueOf(Currency.EUR));
+        transactionDto2.setDescription("Depositing Salary");
+        transactionDto2.setTransactionDirection(String.valueOf(TransactionType.OUT));
+
+        TransactionResponseDto transaction2 = client
+                .post().uri(baseUrl+"/transaction/mybatis/createTransaction")
+                .body(Mono.just(transactionDto2), TransactionDto.class)
+                .exchange()
+                .expectBody(TransactionResponseDto.class)
+                .returnResult().getResponseBody();
+
+        Assert.isTrue(transaction2.getAccountId().equals(accountsDto.getAccount().getAccountId()), "Asserting Account Id");
+        Assert.isTrue(transaction2.getCurrency().equals(accountsDto.getAccount().getCurrency()), "Asserting Currency");
+        Assert.isTrue(transaction2.getBalance().intValue() == 1400, "Asserting Balance after transaction");
+
+        AccountAndTransactionResponseDto transactionsResponseDto = client
+                .get().uri(baseUrl+"/accounts/getAllTransactions?accountId="+accountsDto.getAccount().getAccountId())
+                .exchange().expectBody(AccountAndTransactionResponseDto.class).returnResult().getResponseBody();
+
+
+        Assert.isTrue(transactionsResponseDto.getStatus().equals("SUCCESS"), "Asserting response Status");
+        Assert.isTrue(transactionsResponseDto.getTransactions().size() == 2, "Asserting Number of Transactions Made");
+
+
+        String deleteTransactionResult = client.delete().uri(baseUrl+"/transaction/deleteTransactionByAccountId?accountId="+this.accountId)
+                .exchange().expectBody(String.class).returnResult().getResponseBody();
+        System.out.println("DELETE RESULT: "+deleteTransactionResult);
+    }
+
+
 }
+
+
+
