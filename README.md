@@ -43,8 +43,8 @@ Account Service running on port 8080, Connects to account-serviceDb and has the 
               "currency": "EUR"   // Only Selected Currencies are allowed
             }
      
+     Every input has it's own validation which throws an exception with a wrong input.
      
-  Every input has it's own validation which throws an exception with a wrong input. 
   3. Find Account by account Id: http://localhost:4000/api/v1/accounts/getAccount?accountId=<Replace the account Id you want the details of> Note: Get account Id using Find All Accounts.
   4. Find Account by User Id: http://localhost:4000/api/v1/accounts/getAccountByUser?userId=Johane
   5. Find all transactions using your Account Id: http://localhost:8080/api/v1/accounts/getAllTransactions?accountId=<REPLACE ACCOUNTID HERE>
@@ -62,10 +62,9 @@ Account Service running on port 8080, Connects to account-serviceDb and has the 
               "description":"I Got a PS5"
            }
      
-  Every input has it's own validation which throws an exception with a wrong input 
-  
-  Find All Transaction By Account Id: http://localhost:4000/api/v1/transaction/getTransactionsByAccountId?accountId=<REPLACE ACCOUNT ID HERE>
-  Delete All Transaction By Account Id: http://localhost:4000/api/v1/transaction/deleteTransactionByAccountId?accountId=<REPLACE ACCOUNT ID HERE>
+   2. Every input has it's own validation which throws an exception with a wrong input.
+   3. Find All Transaction By Account Id: http://localhost:4000/api/v1/transaction/getTransactionsByAccountId?accountId=<REPLACE ACCOUNT ID HERE>
+   4. Delete All Transaction By Account Id: http://localhost:4000/api/v1/transaction/deleteTransactionByAccountId?accountId=<REPLACE ACCOUNT ID HERE>
   
   
   
