@@ -1,21 +1,12 @@
-FROM gradle:5.3.0-jdk-alpine AS TEMP_BUILD_IMAGE
-ENV APP_HOME=/usr/app/
-WORKDIR $APP_HOME
-COPY build.gradle settings.gradle $APP_HOME
-
-COPY gradle $APP_HOME/gradle
+FROM gradle:7.2.0-jdk17 AS build
 COPY --chown=gradle:gradle . /home/gradle/src
-USER root
-RUN chown -R gradle /home/gradle/src
+WORKDIR /home/gradle/src
+RUN gradle build --no-daemon
 
-RUN gradle build || return 0
-COPY . .
-RUN gradle clean build
+FROM openjdk:17-jdk-alpine
 
-# actual container
-FROM adoptopenjdk/openjdk11:alpine-jre
-ENV ARTIFACT_NAME=gateway-service-1.0.jar
-ENV APP_HOME=/usr/app/
+RUN mkdir /app
 
-WORKDIR $APP_HOME
-COPY --from=TEMP_BUILD_IMAGE $APP_HOME/build/libs/$ARTIFACT_NAME .
+COPY --from=build /home/gradle/src/build/libs/*.jar /app/spring-boot-application.jar
+
+ENTRYPOINT ["java", "-XX:+UnlockExperimentalVMOptions", "-XX:+UseCGroupMemoryLimitForHeap", "-Djava.security.egd=file:/dev/./urandom","-jar","/app/spring-boot-application.jar"]
