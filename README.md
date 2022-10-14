@@ -15,6 +15,8 @@ To Start this project follow these steps:
   6. you can check if its up and running using the command "docker ps"
 
 This project Includes Integrations tests on all the Rest API's (Make sure all the services are up and running while running the tests)
+
+        This Project Uses MyBatis for data persistence to DB Used MyBatis Generator to generate the sources according to the DB
   
   Please use the Gateway service url as the base URL for all the endpoints
     
