@@ -25,7 +25,7 @@ dependencies {
 }
 
 group = 'com.tuum.bank.registry'
-version = '0.0.1-SNAPSHOT'
+version = '1.0'
 description = 'registry-service'
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
