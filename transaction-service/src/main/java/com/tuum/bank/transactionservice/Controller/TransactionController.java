@@ -54,7 +54,8 @@ public class TransactionController {
 
     @DeleteMapping("/deleteTransactionByAccountId")
     public ResponseEntity<?> deleteTransactionsByAccountId(@RequestParam String accountId){
-        String response = transactionService.deleteAllTransactionsByAccountId(accountId);
+        AccountAndTransactionResponseDto transaction = transactionService.findAllTransactionByAccountId(accountId);
+        String response = transactionService.deleteAllTransactionsByAccountId(transaction);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

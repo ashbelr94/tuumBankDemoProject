@@ -208,11 +208,16 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public String deleteAllTransactionsByAccountId(String accountId) {
-        int i = customTransactionMapper.deleteByAccountId(accountId);
+    public String deleteAllTransactionsByAccountId(AccountAndTransactionResponseDto transactions) {
+        int i = customTransactionMapper.deleteByAccountId(transactions.getAccounts().getAccountId());
         if(i==0){
-            throw new CustomException("Account Id: "+accountId+" Could not be deleted");
+            throw new CustomException("No Transactions Found, Transaction for Account Id: "+transactions.getAccounts().getAccountId()+" Could not be deleted");
         }else {
+            TransactionEvent event = new TransactionEvent();
+            event.setMessage("All Transactions were Deleted Successfully for the account: "+transactions);
+            event.setStatus("DELETED");
+            event.setTransactions(transactions.getTransactions());
+            transactionProducer.sendMessage(event);
             return "Successfully Deleted";
         }
     }

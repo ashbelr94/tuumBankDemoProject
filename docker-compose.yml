@@ -13,6 +13,11 @@ services:
       - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
     ports:
       - 5432:5432
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 0s
+        max_attempts: 5
 
   pgadmin-compose:
     image: dpage/pgadmin4
@@ -60,15 +65,16 @@ services:
     environment:
       - eureka.client.service-url.defaultZone=http://registry-service:8761/eureka
       - SPRING_PROFILES_ACTIVE=docker
-      - spring.datasource.url=jdbc:postgresql://postgres-container:5432/account-serviceDb
-      - spring.datasource.username=postgres
-      - spring.datasource.password=mysecretpassword
-      - spring.datasource.driver-class-name=org.postgresql.Driver
     depends_on:
       - db
       - registry-service
     ports:
       - "8080:8080"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
   transaction-service:
     container_name: transaction-service
     build:
@@ -82,5 +88,10 @@ services:
       - registry-service
     ports:
       - "8081:8081"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
 volumes:
   pgdata:

@@ -125,6 +125,13 @@ public class AccountServiceImpl implements AccountService {
 
         int a = accountsMapper.deleteByPrimaryKey(account.getAccountId());
         if(a == 1){
+
+            AccountEvent event = new AccountEvent();
+            event.setMessage("Account Delete Successfull");
+            event.setStatus("DELETED");
+            event.setAccount(account);
+            accountProducer.sendMessage(event);
+
             return "Delete Success";
         }else {
             throw new CustomException("Could not Delete Resources");
