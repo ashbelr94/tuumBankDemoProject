@@ -2,3 +2,4 @@ account-service/target
 .idea
 tuum-Bank-Project.iml
 log-directory
+buildSrc
