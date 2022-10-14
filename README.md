@@ -14,9 +14,11 @@ To Start this project follow these steps:
   6. you can check if its up and running using the command "docker ps"
 
 This project Includes Integrations tests on all the Rest API's (Make sure all the services are up and running while running the tests)
-Please use the Gateway service url as the base URL for all the endpoints
-Gateway: http://localhost:4000
-Base URL: http://localhost:4000/api/v1
+  
+  Please use the Gateway service url as the base URL for all the endpoints
+    
+    Gateway: http://localhost:4000
+    Base URL: http://localhost:4000/api/v1
 
 This application has 4 services
   1. Account Service
@@ -28,12 +30,15 @@ Account Service running on port 8080, Connects to account-serviceDb and has the 
   1. Find All Accounts Registered: http://localhost:4000/api/v1/accounts/mybatis/getAllAccounts
   2. Create an Account: http://localhost:4000/api/v1/accounts/mybatis/createAccount
       Json Request Body: 
-      {
-        "userId":"Johane",
-        "balance":4382,
-        "country":"Germany",
-        "currency": "EUR"   // Only Selected Currencies are allowed
-      }
+          
+            {
+              "userId":"Johane",
+              "balance":4382,
+              "country":"Germany",
+              "currency": "EUR"   // Only Selected Currencies are allowed
+            }
+     
+     
   Every input has it's own validation which throws an exception with a wrong input. 
   3. Find Account by account Id: http://localhost:4000/api/v1/accounts/getAccount?accountId=<Replace the account Id you want the details of> Note: Get account Id using Find All Accounts.
   4. Find Account by User Id: http://localhost:4000/api/v1/accounts/getAccountByUser?userId=Johane
@@ -41,14 +46,16 @@ Account Service running on port 8080, Connects to account-serviceDb and has the 
   
 Transaction Service running on port 8081, Connects to transaction-serviceDb and has the following Endpoints:
   1. Create a Transaction: http://localhost:4000/api/v1/transaction/mybatis/createTransaction
-    JSON Request Body: 
-    {
-        "accountId":"3837f207-7cd2-4cd2-bbb0-10223b72e273",
-        "amount":999,
-        "currency":"GBP",  // Validation Currencies should Match with the account also has invalid currency exception if given a bad input
-        "transactionDirection":"OUT",   // IN(Deposit) and OUT(Withdrawal)
-        "description":"I Got a PS5"
-     }
+    JSON Request Body:
+    
+          
+          {
+              "accountId":"3837f207-7cd2-4cd2-bbb0-10223b72e273",
+              "amount":999,
+              "currency":"GBP",  // Validation Currencies should Match with the account also has invalid currency exception if given a bad input
+              "transactionDirection":"OUT",   // IN(Deposit) and OUT(Withdrawal)
+              "description":"I Got a PS5"
+           }
      
   Every input has it's own validation which throws an exception with a wrong input 
   
@@ -70,6 +77,7 @@ Features:
   Every Endpoints have validation and appropriate Exceptions thrown on bad inputs.
 
 Scaling Horizontly could be done by the following:
-  Replicating instances of our application and loading balancing them
-  If this exceeds the system resources(CPU, RAM etc), scale by adding new systems and routing the requests distributively
-  Dockerising the application to have resilience services
+
+  1. Replicating instances of our application and loading balancing them.
+  2. If this exceeds the system resources(CPU, RAM etc), scale by adding new systems and routing the requests distributively
+  3. Dockerising the application helps in portability and scaling up the application 
