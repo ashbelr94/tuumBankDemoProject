@@ -9,7 +9,7 @@ Pre-requesites:
 ## To Start this project follow these steps: 
   1. Download the code base (**For Gradle please download from gradlebuild branch**)
   2. open command prompt/terminal and cd into the project folder
-  3. type: **MAVEN** "mvn clean install -DskipTests" / **GRADLE** "gradle build"
+  3. type:  **FOR GRADLE USERS** SKIP to step 4   / **MAVEN USERS** "mvn clean install -DskipTests" / 
   4. Once the repositories and dependencies are downloaded, type "docker-compose up" (NOTE: Make sure to be in the folder where docker-compose.yml file is 			 present).
   5. Wait for services to spin-up and start running
   6. you can check if its up and running using the command "docker ps"
