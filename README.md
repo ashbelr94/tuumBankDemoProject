@@ -1,9 +1,10 @@
 # tuumBankDemoProject
 
 Pre-requesites:
-Maven
-Docker
-Docker-compose
+
+    Maven
+    Docker
+    Docker-compose
 
 To Start this project follow these steps: 
   1. Download the code base
