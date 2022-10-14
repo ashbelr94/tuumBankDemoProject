@@ -86,3 +86,37 @@ Scaling Horizontly could be done by the following:
   1. Replicating instances of our application and loading balancing them.
   2. If this exceeds the system resources(CPU, RAM etc), scale by adding new systems and routing the requests distributively
   3. Dockerising the application helps in portability and scaling up the application 
+  
+For the Purpose of testing I have included a User with the UserId: DemoUser
+        ![Screenshot 2022-10-14 at 8 23 34 PM](https://user-images.githubusercontent.com/52725211/195877299-c81ff246-c917-4fb6-9bed-e9721315c902.png)
+  Account Id will vary for different Machines;
+  
+        Copy the Account Id to perform transactions
+        
+ Creating Account with wrong currency throws the following exception with error message
+        ![Screenshot 2022-10-14 at 8 26 19 PM](https://user-images.githubusercontent.com/52725211/195878032-f3906aea-93ff-454c-b33f-be352acc7ef2.png)
+
+
+
+Successful Account Creation:
+    ![Screenshot 2022-10-14 at 8 28 28 PM](https://user-images.githubusercontent.com/52725211/195878472-cf4c1684-5693-41bf-9f45-20c800c733c1.png)
+
+
+
+
+Transactions with different Currency: Throws Exception with error message to users
+![Screenshot 2022-10-14 at 8 30 28 PM](https://user-images.githubusercontent.com/52725211/195878844-102b8fbc-cadd-4093-9deb-0a0fb3366335.png)
+
+
+Successfull Transaction:
+    ![Screenshot 2022-10-14 at 8 31 36 PM](https://user-images.githubusercontent.com/52725211/195879107-a08b9164-8206-486f-81fc-8e3e6b12b67f.png)
+
+
+Insufficient Funds Transaction:
+
+    ![Screenshot 2022-10-14 at 8 33 04 PM](https://user-images.githubusercontent.com/52725211/195879413-43fd1c18-e407-478c-a6dc-fd51e475adaf.png)
+
+
+Finding All Transactions for an account:
+![Screenshot 2022-10-14 at 8 34 27 PM](https://user-images.githubusercontent.com/52725211/195879688-f13beda0-9c50-4226-ac47-8989dcba9770.png)
+
