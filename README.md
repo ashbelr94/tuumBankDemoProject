@@ -1,6 +1,7 @@
 # tuumBankDemoProject
 
 Pre-requesites: 
+### GRADLE USERS SWITCH TO gradleBuild Branch
 
     Maven/Gradle (For Gradle Please download project from gradle build)
     Docker
