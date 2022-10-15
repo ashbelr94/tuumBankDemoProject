@@ -1,6 +1,4 @@
-# tuumBankDemoProject
-
-# tuumBankDemoProject
+# TuumBankDemoProject
 
 Pre-requesites: 
 
