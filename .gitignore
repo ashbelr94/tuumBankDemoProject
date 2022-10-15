@@ -1,5 +1,6 @@
 account-service/target
 .idea
 tuum-Bank-Project.iml
-log-directory
-buildSrc
+.gradle
+buildSrc/.gradle
+buildSrc/build

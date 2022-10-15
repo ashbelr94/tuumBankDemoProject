@@ -3,3 +3,4 @@
  */
 
 rootProject.name = 'tuum-Bank-Project'
+include 'account-service', 'transaction-service', 'gateway-service', 'registry-service'

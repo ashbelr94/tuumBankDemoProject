@@ -5,16 +5,20 @@
  */
 
 plugins {
+    id 'org.springframework.boot' version '2.7.4'
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id 'java'
-    id 'maven-publish'
 }
 
+
 repositories {
-    mavenLocal()
-    maven {
-        url = uri('https://repo.maven.apache.org/maven2/')
-    }
+    mavenCentral()
 }
+
+ext {
+    set('springCloudVersion', "2021.0.4")
+}
+
 
 dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-server:3.1.4'
@@ -27,16 +31,14 @@ dependencies {
 group = 'com.tuum.bank.registry'
 version = '1.0'
 description = 'registry-service'
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = 17
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            from(components.java)
-        }
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+tasks.named('test') {
+    useJUnitPlatform()
 }
