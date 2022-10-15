@@ -45,7 +45,7 @@ services:
       context: ./registry-service
       dockerfile: Dockerfile
     ports:
-      - "8761:8761"
+      - 8761:8761
   gateway-service:
     container_name: gateway-service
     build:
@@ -56,7 +56,7 @@ services:
     depends_on:
       - registry-service
     ports:
-      - "4000:4000"
+      - 4000:4000
   account-service:
     container_name: account-service
     build:
@@ -69,7 +69,7 @@ services:
       - db
       - registry-service
     ports:
-      - "8080:8080"
+      - 8080:8080
     deploy:
       restart_policy:
         condition: on-failure
@@ -87,7 +87,7 @@ services:
       - db
       - registry-service
     ports:
-      - "8081:8081"
+      - 8081:8081
     deploy:
       restart_policy:
         condition: on-failure
