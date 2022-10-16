@@ -67,7 +67,11 @@ Account Service running on port 8080, Connects to account-serviceDb and has the 
    3. Find All Transaction By Account Id: http://localhost:4000/api/v1/transaction/getTransactionsByAccountId?accountId=<REPLACE ACCOUNT ID HERE>
    4. Delete All Transaction By Account Id: http://localhost:4000/api/v1/transaction/deleteTransactionByAccountId?accountId=<REPLACE ACCOUNT ID HERE>
   
-  
+## RabbitMq:
+    Rabbit Mq runs on port 15672.
+    Use this Endpoint to access RabbitMq http://localhost:15672/
+        Username: guest
+        password: guest
   
 
 ## I have optionally tried using reactive programming on certain api's which may be incorrect cause reactive should be in a nonblocking way need sometime to work on this. 
@@ -83,7 +87,7 @@ Account Service running on port 8080, Connects to account-serviceDb and has the 
 
 ### Scaling Horizontly could be done by the following:
 
-  1. Replicating instances of our application and loading balancing them.
+  1. Replicating instances of our application and load balancing them.
   2. If this exceeds the system resources(CPU, RAM etc), scale by adding new systems and routing the requests distributively
   3. Dockerising the application helps in portability and scaling up the application 
   
