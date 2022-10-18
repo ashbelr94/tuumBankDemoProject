@@ -90,6 +90,7 @@ Account Service running on port 8080, Connects to account-serviceDb and has the 
   1. Replicating instances of our application and load balancing them.
   2. If this exceeds the system resources(CPU, RAM etc), scale by adding new systems and routing the requests distributively
   3. Dockerising the application helps in portability and scaling up the application 
+  4. Spinup multiple instances of the services as per the load (Auto Scaling) to have a resilient service
   
 For the Purpose of testing I have included a User with the UserId: DemoUser
         ![Screenshot 2022-10-14 at 8 23 34 PM](https://user-images.githubusercontent.com/52725211/195877299-c81ff246-c917-4fb6-9bed-e9721315c902.png)
