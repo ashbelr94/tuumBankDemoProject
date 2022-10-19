@@ -8,7 +8,7 @@ Pre-requesites:
 
 ## To Start this project follow these steps: 
   1. Download the code base (**For Gradle please download from gradlebuild branch**)
-  2. open command prompt/terminal and cd into the project folder
+  2. Open command prompt/terminal and cd into the project folder
   3. Type "docker-compose up" (NOTE: Make sure to be in the folder where docker-compose.yml file is present).
   4. Wait for services to spin-up and start running
   5. you can check if its up and running using the command "docker ps"
@@ -73,6 +73,11 @@ Account Service running on port 8080, Connects to account-serviceDb and has the 
   2. Find Account By Account Id: http://localhost:4000/api/v1/accounts/webclient/getAccount?accountId=<REPLACE ACCOUNT ID HERE>
   3. Find Transactions by Account Id: http://localhost:4000/api/v1/transaction/getTransactionsByAccountId?accountId=<REPLACE ACCOUNT ID HERE>
 
+ ## RabbitMq:
+    Rabbit Mq runs on port 15672.
+    Use this Endpoint to access RabbitMq http://localhost:15672/
+        Username: guest
+        password: guest
 
 ##  Features: 
   All services are registered to eureka server and Gateway handles routing of services between services.
@@ -81,9 +86,10 @@ Account Service running on port 8080, Connects to account-serviceDb and has the 
 
 ### Scaling Horizontly could be done by the following:
 
-  1. Replicating instances of our application and loading balancing them.
+  1. Replicating instances of our application and load balancing them.
   2. If this exceeds the system resources(CPU, RAM etc), scale by adding new systems and routing the requests distributively
-  3. Dockerising the application helps in portability and scaling up the application 
+  3. Dockerising the application helps in portability and scaling up the application.
+  4. Spinup multiple instances of the services as per the load (Auto Scaling) to have a resilient service
   
 For the Purpose of testing I have included a User with the UserId: DemoUser
         ![Screenshot 2022-10-14 at 8 23 34 PM](https://user-images.githubusercontent.com/52725211/195877299-c81ff246-c917-4fb6-9bed-e9721315c902.png)
