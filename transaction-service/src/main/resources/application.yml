@@ -36,6 +36,10 @@ management:
   health:
     circuitbreakers:
       enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
   endpoint:
     health:
       show-details: always
@@ -45,11 +49,12 @@ resilience4j:
     instances:
       accounts:
         registerHealthIndicator: true
-        event-consumer-buffer-size: 10
+        eventConsumerBufferSize: 10
         slidingWindowType: COUNT_BASED
-        slidingWindowSize: 20
+        minimumNumberOfCalls: 10
+        slidingWindowSize: 10
         failureRateThreshold: 50
         waitDurationInOpenState: 5s
-        permittedNumberOfCallsInHalfOpenState: 10
+        permittedNumberOfCallsInHalfOpenState: 5
         automaticTransitionFromOpenToHalfOpenEnabled: true
 #Resilinence4j

@@ -89,7 +89,7 @@ public class TransactionServiceImpl implements TransactionService {
 //    }
 
     @Override
-    @CircuitBreaker(name = "accounts", fallbackMethod = "fallback")
+    @CircuitBreaker(name = "accounts", fallbackMethod = "accountTransactionFallback")
     public TransactionResponseDto createTransaction(TransactionDto transactionDto) {
 
 
@@ -158,7 +158,10 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionResponseDto;
     }
 
-    public TransactionResponseDto fallback(TransactionDto transactionDto, RuntimeException runtimeException){
+    public TransactionResponseDto accountTransactionFallback(TransactionDto transactionDto, RuntimeException runtimeException){
+        if(runtimeException.getMessage().contains("503 Service Unavailable from UNKNOWN ")){
+            throw new CustomException("Service is temporarily down please try again later");
+        }
         if(runtimeException.getMessage().contains("api/v1/accounts/updateBalance")) {
             throw new CustomException("Account Balance updated, transaction not persisted, Roll back Account Balance Update");
         } else {
@@ -167,7 +170,18 @@ public class TransactionServiceImpl implements TransactionService {
 
     }
 
+    public AccountAndTransactionResponseDto accountFallback(String accountId, RuntimeException runtimeException){
+        SelectStatementProvider allTransactionQuery = SqlBuilder.select(transaction.allColumns())
+                .from(transaction).where(transaction.accountId, isLike(accountId))
+                .build()
+                .render(RenderingStrategies.MYBATIS3);
+        List<Transaction> transactionsList = transactionMapper.selectMany(allTransactionQuery);
+        AccountAndTransactionResponseDto accAndTransacRepo = new AccountAndTransactionResponseDto();
+        accAndTransacRepo.setTransactions(transactionsList);
+        return accAndTransacRepo;
+    }
 
+    @CircuitBreaker(name = "accounts", fallbackMethod = "accountFallback")
     public AccountAndTransactionResponseDto findAllTransactionByAccountId(String accountId) {
         AccountClientResponseDto accountsDto = webClientBuilder.build().get().uri("http://account-service/api/v1/accounts/getAccount",
                         uriBuilder -> uriBuilder.queryParam("accountId", accountId).build())
@@ -188,7 +202,7 @@ public class TransactionServiceImpl implements TransactionService {
         return accAndTransacRepo;
     }
 
-
+    @CircuitBreaker(name = "accounts", fallbackMethod = "accountFallback")
     public AccountAndTransactionResponseDto findAllTransactionByAccountIdWebClient(String accountId) {
         Mono<AccountClientResponseDto> accountsDto = webClientBuilder.build().get().uri("http://account-service/api/v1/accounts/webclient/getAccount",
                         uriBuilder -> uriBuilder.queryParam("accountId", accountId).build())

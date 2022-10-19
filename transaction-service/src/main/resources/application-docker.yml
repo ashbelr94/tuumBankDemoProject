@@ -36,6 +36,10 @@ management:
   health:
     circuitbreakers:
       enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
   endpoint:
     health:
       show-details: always
@@ -50,5 +54,5 @@ resilience4j:
         slidingWindowSize: 20
         failureRateThreshold: 50
         waitDurationInOpenState: 5s
-        permittedNumberOfCallsInHalfOpenState: 20
+        permittedNumberOfCallsInHalfOpenState: 10
         automaticTransitionFromOpenToHalfOpenEnabled: true
